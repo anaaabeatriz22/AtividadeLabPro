@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum Dificuldade {
+  FACIL
+  MEDIO
+  DIFICIL
+}
+model Professor {
+
+  id          Int      @id @default(autoincrement())
+  nome        String
+
+  questao Questao[]
+  disciplina Disciplina[]
+
+  @@map("professor")
+}
+
+model Aluno {
+
+  id          Int      @id @default(autoincrement())
+  nome        String
+
+  teste Teste[]
+
+  @@map("aluno")
+}
+
+model Questao {
+
+  id          Int      @id @default(autoincrement())
+  enunciado   String
+  gabarito    Boolean
+  dificuldade Dificuldade
+  dataCadastro DateTime @default(now()) @map("data_cadastro")
+  
+  professorId Int @map("professor_id")
+  professor  Professor  @relation(fields: [professorId], references: [id])
+
+  assuntoId Int @map("assunto_id")
+  assunto  Assunto  @relation(fields: [assuntoId], references: [id])
+
+  @@map("questao")
+}
+
+model Assunto {
+
+  id          Int      @id @default(autoincrement())
+  nome        String
+
+  teste Teste[]
+  questaoes Questao[]
+
+  disciplinaId Int @map("disciplina_id")
+  disciplina Disciplina @relation(fields: [disciplinaId], references: [id])
+
+  @@map("assunto")
+}
+
+model Teste {
+
+  id                 Int      @id @default(autoincrement())
+  inicio             DateTime @default(now())
+  fim                DateTime
+  quantidadeQuestoes Int? @map("quantidade_questoes")
+  pontuacao          Int?
+  aluno_id           Int?
+  aluno Aluno?       @relation(fields: [aluno_id], references: [id])
+
+  assunto_id         Int?
+  assunto Assunto?   @relation(fields: [assunto_id], references: [id])
+
+  
+  
+
+  @@map("teste")
+}
+
+model Disciplina{
+    id          Int      @id @default(autoincrement())
+    nome        String
+
+  professor     Professor[]
+  assunto       Assunto[]
+
+  @@map("disciplina")
+}
